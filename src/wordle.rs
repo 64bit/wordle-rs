@@ -78,21 +78,27 @@ impl<'w> Wordle<'w> {
 
         let word = word.to_uppercase();
         if self.dictionary.is_valid_word(word.as_str()) {
+            let mut original_word = self.word.clone();
             let current_attempt = self.current_attempt as usize;
             self.current_attempt += 1;
             for (idx, ch) in word.as_bytes().iter().enumerate() {
                 let turn = &mut self.guesses[current_attempt];
                 turn[idx].chr = *ch;
+                let letters = [*ch];
+                let letter = std::str::from_utf8(letters.as_slice()).unwrap();
+
                 if self.word.as_bytes()[idx] == *ch {
-                    turn[idx].mch = Match::ExactLocation
+                    turn[idx].mch = Match::ExactLocation;
+                    original_word.remove(original_word.find(letter).unwrap());
                 } else {
-                    match self
-                        .word
-                        .contains(std::str::from_utf8([*ch].as_slice()).unwrap())
-                    {
-                        true => turn[idx].mch = Match::PresentInWord,
-                        false => turn[idx].mch = Match::AbsentInWord,
-                    }
+                    let found = original_word.find(letter);
+                    match found {
+                        Some(index) => {
+                            turn[idx].mch = Match::PresentInWord;
+                            original_word.remove(index);
+                        }
+                        None => turn[idx].mch = Match::AbsentInWord,
+                    };
                 }
             }
 
@@ -196,6 +202,114 @@ mod tests {
 
         match play_result {
             PlayResult::YouWon(computed) => {
+                assert_eq!(computed.len(), expected_turn_input.len());
+                assert!(computed
+                    .iter()
+                    .zip(expected_turn_input.iter())
+                    .all(|(com, exp)| com.chr == exp.chr && com.mch == exp.mch))
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
+    fn test_duplicate() {
+        struct DupDict;
+        impl Dictionary for DupDict {
+            fn random_word(&self) -> &str {
+                "GREED"
+            }
+
+            fn is_valid_word(&self, word: &str) -> bool {
+                ["GREED", "ELITE"].contains(&word)
+            }
+        }
+
+        let dup_dict = DupDict {};
+        let mut wordle = Wordle::new(&dup_dict);
+        let play_result = wordle.play("ELITE");
+        assert!(play_result.is_ok());
+        let play_result = play_result.unwrap();
+
+        let expected_turn_input = [
+            Input {
+                chr: b'E',
+                mch: Match::PresentInWord,
+            },
+            Input {
+                chr: b'L',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'I',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'T',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'E',
+                mch: Match::PresentInWord,
+            },
+        ];
+
+        match play_result {
+            PlayResult::TurnResult(computed) => {
+                assert_eq!(computed.len(), expected_turn_input.len());
+                assert!(computed
+                    .iter()
+                    .zip(expected_turn_input.iter())
+                    .all(|(com, exp)| com.chr == exp.chr && com.mch == exp.mch))
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
+    fn test_double_letters() {
+        struct DupDict;
+        impl Dictionary for DupDict {
+            fn random_word(&self) -> &str {
+                "GLIDE"
+            }
+
+            fn is_valid_word(&self, word: &str) -> bool {
+                ["GLIDE", "GREED"].contains(&word)
+            }
+        }
+
+        let dup_dict = DupDict {};
+        let mut wordle = Wordle::new(&dup_dict);
+        let play_result = wordle.play("GREED");
+        assert!(play_result.is_ok());
+        let play_result = play_result.unwrap();
+
+        let expected_turn_input = [
+            Input {
+                chr: b'G',
+                mch: Match::ExactLocation,
+            },
+            Input {
+                chr: b'R',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'E',
+                mch: Match::PresentInWord,
+            },
+            Input {
+                chr: b'E',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'D',
+                mch: Match::PresentInWord,
+            },
+        ];
+
+        match play_result {
+            PlayResult::TurnResult(computed) => {
                 assert_eq!(computed.len(), expected_turn_input.len());
                 assert!(computed
                     .iter()
