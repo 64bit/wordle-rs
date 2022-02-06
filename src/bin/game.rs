@@ -1,8 +1,8 @@
 use std::process::exit;
 
 use anyhow::Result;
-mod dictionary;
-mod wordle;
+use rs_wordle as wordle;
+use wordle::dictionary;
 
 fn main() -> Result<(), anyhow::Error> {
     let dictionary = dictionary::EnglishDictionary::load()?;
