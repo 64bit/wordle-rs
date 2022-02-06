@@ -78,40 +78,48 @@ impl<'w> Wordle<'w> {
 
         let word = word.to_uppercase();
         if self.dictionary.is_valid_word(word.as_str()) {
-            let mut original_word = self.word.clone();
             let current_attempt = self.current_attempt as usize;
             self.current_attempt += 1;
-            for (idx, ch) in word.as_bytes().iter().enumerate().rev() {
-                let turn = &mut self.guesses[current_attempt];
-                turn[idx].chr = *ch;
-                let letters = [*ch];
-                let letter = std::str::from_utf8(letters.as_slice()).unwrap();
+            let mut input_letter_count = [0_u8; 26];
+            for ch in self.word.as_bytes() {
+                input_letter_count[(*ch - b'A') as usize] += 1
+            }
 
+            let mut processed: Vec<i8> = vec![1, 2, 3, 4, 5];
+            let turn_input = &mut self.guesses[current_attempt];
+
+            // first process exact matches
+            for (idx, ch) in word.as_bytes().iter().enumerate() {
+                turn_input[idx].chr = *ch;
                 if self.word.as_bytes()[idx] == *ch {
-                    turn[idx].mch = Match::ExactLocation;
-                    original_word.remove(original_word.find(letter).unwrap());
-                } else {
-                    let found = original_word.find(letter);
-                    match found {
-                        Some(index) => {
-                            turn[idx].mch = Match::PresentInWord;
-                            original_word.remove(index);
-                        }
-                        None => turn[idx].mch = Match::AbsentInWord,
-                    };
+                    turn_input[idx].mch = Match::ExactLocation;
+                    input_letter_count[(ch - b'A') as usize] -= 1;
+                    processed[idx] = -processed[idx];
                 }
             }
 
-            return match self.word == word {
-                true => Ok(PlayResult::YouWon(&self.guesses[current_attempt])),
-                false => {
-                    if self.current_attempt == 6 {
-                        Ok(PlayResult::YouLost(&self.word))
-                    } else {
-                        Ok(PlayResult::TurnResult(&self.guesses[current_attempt]))
+            // process remaining letters (not present in word, or present in word)
+            for position in processed.iter() {
+                if *position > 0_i8 {
+                    let index = (*position - 1) as usize;
+                    let input_ch = word.as_bytes().get(index).unwrap();
+                    let index_in_count = (*input_ch - b'A') as usize;
+                    if input_letter_count[index_in_count] > 0 {
+                        turn_input[index].mch = Match::PresentInWord;
+                        input_letter_count[index_in_count] -= 1;
                     }
                 }
-            };
+            }
+
+            if word == self.word {
+                return Ok(PlayResult::YouWon(&self.guesses[current_attempt]));
+            }
+
+            if self.current_attempt == 6 {
+                return Ok(PlayResult::YouLost(self.word.as_str()));
+            } else {
+                return Ok(PlayResult::TurnResult(&self.guesses[current_attempt]));
+            }
         }
 
         Err(anyhow::anyhow!(
@@ -296,11 +304,11 @@ mod tests {
             },
             Input {
                 chr: b'E',
-                mch: Match::AbsentInWord,
+                mch: Match::PresentInWord,
             },
             Input {
                 chr: b'E',
-                mch: Match::PresentInWord,
+                mch: Match::AbsentInWord,
             },
             Input {
                 chr: b'D',
@@ -310,7 +318,6 @@ mod tests {
 
         match play_result {
             PlayResult::TurnResult(computed) => {
-                println!("{:#?}", computed);
                 assert_eq!(computed.len(), expected_turn_input.len());
                 assert!(computed
                     .iter()
@@ -365,7 +372,6 @@ mod tests {
 
         match play_result {
             PlayResult::TurnResult(computed) => {
-                println!("{:#?}", computed);
                 assert_eq!(computed.len(), expected_turn_input.len());
                 assert!(computed
                     .iter()
