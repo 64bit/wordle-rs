@@ -6,7 +6,7 @@ use wordle::dictionary;
 
 fn main() -> Result<(), anyhow::Error> {
     let dictionary = dictionary::EnglishDictionary::new()?;
-    let mut wordle = wordle::Wordle::new(&dictionary)?;
+    let mut wordle = wordle::Wordle::new(&dictionary);
     let mut current_guess = String::new();
     loop {
         current_guess.clear();

@@ -12,7 +12,7 @@ pub struct Wordle<'w> {
 
 //type Distribution = HashMap<u8, u8>;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Match {
     ExactLocation,
     PresentInWord,
@@ -40,19 +40,19 @@ pub enum PlayResult<'w> {
 }
 
 impl<'w> Wordle<'w> {
-    pub fn new(dictionary: &'w dyn Dictionary) -> Result<Self> {
+    pub fn new(dictionary: &'w dyn Dictionary) -> Self {
         let word = dictionary.random_word().to_uppercase();
 
         if std::env::var("DEBUG").is_ok() {
             println!("[DEBUG] Word is {}", word);
         }
 
-        Ok(Wordle {
+        Wordle {
             dictionary,
             word,
             current_attempt: Default::default(),
             guesses: Default::default(),
-        })
+        }
     }
 
     pub fn current_attempt(&self) -> u8 {
@@ -123,7 +123,14 @@ fn fmt_turn_input(f: &mut std::fmt::Formatter<'_>, turn_input: &TurnInput) -> st
             Match::AbsentInWord => write!(f, "{:3}", White.bold().on(Red).paint(letter))?,
             Match::ExactLocation => write!(f, "{:3}", RGB(0, 0, 0).bold().on(Green).paint(letter))?,
             Match::PresentInWord => {
-                write!(f, "{:3}", RGB(0, 0, 0).bold().on(RGB(255,255,0) /* Custom Yellow */).paint(letter))?
+                write!(
+                    f,
+                    "{:3}",
+                    RGB(0, 0, 0)
+                        .bold()
+                        .on(RGB(255, 255, 0) /* Custom Yellow */)
+                        .paint(letter)
+                )?
             }
         }
     }
@@ -139,6 +146,63 @@ impl<'w> Display for PlayResult<'w> {
                 fmt_turn_input(f, turn_input)?;
                 writeln!(f, "\nCongratulations you won!")
             }
+        }
+    }
+}
+
+mod tests {
+    use super::*;
+
+    struct TestDict;
+    impl Dictionary for TestDict {
+        fn random_word(&self) -> &str {
+            "ARIEL"
+        }
+
+        fn is_valid_word(&self, word: &str) -> bool {
+            ["ARIEL"].contains(&word)
+        }
+    }
+    #[test]
+    fn test_win_single_attempt() {
+        let test_dict = TestDict {};
+        let mut wordle = Wordle::new(&test_dict);
+        let play_result = wordle.play("ArIeL");
+        assert!(play_result.is_ok());
+        let play_result = play_result.unwrap();
+
+        let expected_turn_input = [
+            Input {
+                chr: b'A',
+                mch: Match::ExactLocation,
+            },
+            Input {
+                chr: b'R',
+                mch: Match::ExactLocation,
+            },
+            Input {
+                chr: b'I',
+                mch: Match::ExactLocation,
+            },
+            Input {
+                chr: b'E',
+                mch: Match::ExactLocation,
+            },
+            Input {
+                chr: b'L',
+                mch: Match::ExactLocation,
+            },
+        ];
+
+        match play_result {
+            PlayResult::YouWon(computed) => {
+                assert_eq!(computed.len(), expected_turn_input.len());
+                assert!(computed
+                    .iter()
+                    .zip(expected_turn_input.iter())
+                    .all(|(com, exp)| com.chr == exp.chr && com.mch == exp.mch))
+            }
+            _ => panic!(),
         }
     }
 }
