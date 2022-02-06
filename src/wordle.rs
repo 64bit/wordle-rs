@@ -81,7 +81,7 @@ impl<'w> Wordle<'w> {
             let mut original_word = self.word.clone();
             let current_attempt = self.current_attempt as usize;
             self.current_attempt += 1;
-            for (idx, ch) in word.as_bytes().iter().enumerate() {
+            for (idx, ch) in word.as_bytes().iter().enumerate().rev() {
                 let turn = &mut self.guesses[current_attempt];
                 turn[idx].chr = *ch;
                 let letters = [*ch];
@@ -296,11 +296,11 @@ mod tests {
             },
             Input {
                 chr: b'E',
-                mch: Match::PresentInWord,
+                mch: Match::AbsentInWord,
             },
             Input {
                 chr: b'E',
-                mch: Match::AbsentInWord,
+                mch: Match::PresentInWord,
             },
             Input {
                 chr: b'D',
@@ -310,6 +310,62 @@ mod tests {
 
         match play_result {
             PlayResult::TurnResult(computed) => {
+                println!("{:#?}", computed);
+                assert_eq!(computed.len(), expected_turn_input.len());
+                assert!(computed
+                    .iter()
+                    .zip(expected_turn_input.iter())
+                    .all(|(com, exp)| com.chr == exp.chr && com.mch == exp.mch))
+            }
+            _ => panic!(),
+        }
+    }
+
+    #[test]
+    fn test_double_letters_input_match_in_future() {
+        struct DupDict;
+        impl Dictionary for DupDict {
+            fn random_word(&self) -> &str {
+                "TRULY"
+            }
+
+            fn is_valid_word(&self, word: &str) -> bool {
+                ["TRULY", "KELLY"].contains(&word)
+            }
+        }
+
+        let dup_dict = DupDict {};
+        let mut wordle = Wordle::new(&dup_dict);
+        let play_result = wordle.play("KELLY");
+        assert!(play_result.is_ok());
+        let play_result = play_result.unwrap();
+
+        let expected_turn_input = [
+            Input {
+                chr: b'K',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'E',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'L',
+                mch: Match::AbsentInWord,
+            },
+            Input {
+                chr: b'L',
+                mch: Match::ExactLocation,
+            },
+            Input {
+                chr: b'Y',
+                mch: Match::ExactLocation,
+            },
+        ];
+
+        match play_result {
+            PlayResult::TurnResult(computed) => {
+                println!("{:#?}", computed);
                 assert_eq!(computed.len(), expected_turn_input.len());
                 assert!(computed
                     .iter()
