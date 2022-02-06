@@ -10,7 +10,7 @@ fn main() -> Result<(), anyhow::Error> {
     let mut current_guess = String::new();
     loop {
         current_guess.clear();
-        println!("Enter your guess ({}/6)", wordle.current_attempt());
+        println!("Enter your guess [{}/6]", wordle.current_attempt());
         std::io::stdin().read_line(&mut current_guess)?;
         let play_result = wordle.play(current_guess.trim());
         match play_result {

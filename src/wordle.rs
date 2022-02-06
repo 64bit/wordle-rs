@@ -41,10 +41,15 @@ pub enum PlayResult<'w> {
 
 impl<'w> Wordle<'w> {
     pub fn new(dictionary: &'w dyn Dictionary) -> Self {
-        let word = dictionary.random_word().to_uppercase();
-
-        if std::env::var("DEBUG").is_ok() {
-            println!("[DEBUG] Word is {}", word);
+        let word: String;
+        if let Ok(seed) = std::env::var("SEED") {
+            let seed = seed.to_uppercase();
+            if !dictionary.is_valid_word(seed.as_str()) {
+                panic!("SEED ({}) is not a valid word in dictionary.", seed);
+            }
+            word = seed;
+        } else {
+            word = dictionary.random_word().to_uppercase();
         }
 
         Wordle {
@@ -64,15 +69,9 @@ impl<'w> Wordle<'w> {
             return Ok(PlayResult::YouLost(&self.word));
         }
 
-        if word.len() > 5 {
+        if word.len() > 5 || word.len() < 5 {
             return Err(anyhow::anyhow!(
-                "Please enter a valid word with 5 letters. Word too long."
-            ));
-        }
-
-        if word.len() < 5 {
-            return Err(anyhow::anyhow!(
-                "Please enter a valid word with 5 letters. Word too short."
+                "Please enter a valid word with 5 letters."
             ));
         }
 
@@ -155,10 +154,10 @@ impl<'w> Display for PlayResult<'w> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
             PlayResult::TurnResult(turn_input) => fmt_turn_input(f, turn_input),
-            PlayResult::YouLost(word) => writeln!(f, "You lost! The word is {}", word),
+            PlayResult::YouLost(word) => writeln!(f, "The word is {}. Ouch! 🤕", word),
             PlayResult::YouWon(turn_input) => {
                 fmt_turn_input(f, turn_input)?;
-                writeln!(f, "\nCongratulations you won!")
+                writeln!(f, "\nCongratulations you won! 🎉")
             }
         }
     }
