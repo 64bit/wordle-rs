@@ -1,11 +1,10 @@
-use crate::dictionary::EnglishDictionary;
+use crate::dictionary::Dictionary;
 use ansi_term::Color::{Green, Red, White, RGB};
 use anyhow::Result;
 use std::fmt::Display;
 
-#[derive(Debug)]
 pub struct Wordle<'w> {
-    dictionary: &'w EnglishDictionary,
+    dictionary: &'w dyn Dictionary,
     word: String,
     current_attempt: u8,
     guesses: [TurnInput; 6],
@@ -41,7 +40,7 @@ pub enum PlayResult<'w> {
 }
 
 impl<'w> Wordle<'w> {
-    pub fn new(dictionary: &'w EnglishDictionary) -> Result<Self> {
+    pub fn new(dictionary: &'w dyn Dictionary) -> Result<Self> {
         let word = dictionary.random_word().to_uppercase();
 
         if std::env::var("DEBUG").is_ok() {
@@ -138,7 +137,7 @@ impl<'w> Display for PlayResult<'w> {
             PlayResult::YouLost(word) => writeln!(f, "You lost! The word is {}", word),
             PlayResult::YouWon(turn_input) => {
                 fmt_turn_input(f, turn_input)?;
-                writeln!(f, "Congratulations you won!")
+                writeln!(f, "\nCongratulations you won!")
             }
         }
     }

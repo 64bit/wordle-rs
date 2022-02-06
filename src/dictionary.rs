@@ -6,6 +6,12 @@ use std::cell::RefCell;
 
 const DICTIONARY_PATH: &str = "/usr/share/dict/words";
 
+pub trait Dictionary {
+    //fn load() -> Result<&'d dyn Dictionary>;
+    fn random_word(&self) -> &str;
+    fn is_valid_word(&self, word: &str) -> bool;
+}
+
 #[derive(Debug)]
 pub struct EnglishDictionary {
     words: IndexSet<String>,
@@ -13,7 +19,7 @@ pub struct EnglishDictionary {
 }
 
 impl EnglishDictionary {
-    pub fn load() -> Result<Self> {
+    pub fn new() -> Result<EnglishDictionary> {
         let contents = std::fs::read(DICTIONARY_PATH)?;
         let contents = String::from_utf8(contents)?;
         let words: IndexSet<String> = contents
@@ -27,13 +33,15 @@ impl EnglishDictionary {
             rng_refcell: RefCell::new(rand::thread_rng()),
         })
     }
+}
 
-    pub fn random_word(&self) -> &str {
+impl Dictionary for EnglishDictionary {
+    fn random_word(&self) -> &str {
         let random_index = self.rng_refcell.borrow_mut().gen_range(0..self.words.len());
         self.words.get_index(random_index).unwrap().as_str()
     }
 
-    pub fn is_valid_word(&self, word: &str) -> bool {
+    fn is_valid_word(&self, word: &str) -> bool {
         matches!(self.words.get(word), Some(_))
     }
 }
