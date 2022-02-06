@@ -70,9 +70,7 @@ impl<'w> Wordle<'w> {
         }
 
         if word.len() > 5 || word.len() < 5 {
-            return Err(anyhow::anyhow!(
-                "Please enter a valid word with 5 letters."
-            ));
+            return Err(anyhow::anyhow!("Please enter a valid word with 5 letters."));
         }
 
         let word = word.to_uppercase();
