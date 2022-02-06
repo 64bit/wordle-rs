@@ -7,7 +7,6 @@ use std::cell::RefCell;
 const DICTIONARY_PATH: &str = "/usr/share/dict/words";
 
 pub trait Dictionary {
-    //fn load() -> Result<&'d dyn Dictionary>;
     fn random_word(&self) -> &str;
     fn is_valid_word(&self, word: &str) -> bool;
 }

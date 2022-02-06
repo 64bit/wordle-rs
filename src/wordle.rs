@@ -8,6 +8,7 @@ pub struct Wordle<'w> {
     word: String,
     current_attempt: u8,
     guesses: [TurnInput; 6],
+    game_ended_at_attempt: u8,
 }
 
 //type Distribution = HashMap<u8, u8>;
@@ -57,6 +58,7 @@ impl<'w> Wordle<'w> {
             word,
             current_attempt: Default::default(),
             guesses: Default::default(),
+            game_ended_at_attempt: 128,
         }
     }
 
@@ -65,8 +67,8 @@ impl<'w> Wordle<'w> {
     }
 
     pub fn play(&mut self, word: &str) -> Result<PlayResult> {
-        if self.current_attempt == 6 {
-            return Ok(PlayResult::YouLost(&self.word));
+        if self.game_ended_at_attempt <= self.current_attempt + 1 {
+            return Err(anyhow::anyhow!("Game Ended"));
         }
 
         if word.len() > 5 || word.len() < 5 {
@@ -109,10 +111,12 @@ impl<'w> Wordle<'w> {
             }
 
             if word == self.word {
+                self.game_ended_at_attempt = self.current_attempt;
                 return Ok(PlayResult::YouWon(&self.guesses[current_attempt]));
             }
 
             if self.current_attempt == 6 {
+                self.game_ended_at_attempt = self.current_attempt;
                 return Ok(PlayResult::YouLost(self.word.as_str()));
             } else {
                 return Ok(PlayResult::TurnResult(&self.guesses[current_attempt]));
@@ -215,6 +219,9 @@ mod tests {
             }
             _ => panic!(),
         }
+
+        // game ended
+        assert!(wordle.play("dream").is_err());
     }
 
     #[test]
