@@ -1,7 +1,7 @@
 use std::process::exit;
 
 use anyhow::Result;
-use rs_wordle as wordle;
+use wordlers as wordle;
 use wordle::dictionary;
 
 fn main() -> Result<(), anyhow::Error> {

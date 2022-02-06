@@ -1,5 +1,5 @@
 [package]
-name = "rs-wordle"
+name = "wordlers"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,5 +12,5 @@ indexmap = "1.8.0"
 ansi_term = "0.12.1"
 
 [[bin]]
-name = "wordle"
+name = "wordlers"
 path = "src/bin/game.rs"
