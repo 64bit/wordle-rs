@@ -1,5 +1,5 @@
 use crate::dictionary::EnglishDictionary;
-use ansi_term::Color::{Green, Red, White, Yellow, RGB};
+use ansi_term::Color::{Green, Red, White, RGB};
 use anyhow::Result;
 use std::fmt::Display;
 
@@ -124,7 +124,7 @@ fn fmt_turn_input(f: &mut std::fmt::Formatter<'_>, turn_input: &TurnInput) -> st
             Match::AbsentInWord => write!(f, "{:3}", White.bold().on(Red).paint(letter))?,
             Match::ExactLocation => write!(f, "{:3}", RGB(0, 0, 0).bold().on(Green).paint(letter))?,
             Match::PresentInWord => {
-                write!(f, "{:3}", RGB(0, 0, 0).bold().on(Yellow).paint(letter))?
+                write!(f, "{:3}", RGB(0, 0, 0).bold().on(RGB(255,255,0) /* Custom Yellow */).paint(letter))?
             }
         }
     }
