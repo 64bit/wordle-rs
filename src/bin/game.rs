@@ -1,8 +1,8 @@
 use std::process::exit;
 
 use anyhow::Result;
-use wordlers::dictionary::EnglishDictionary;
-use wordlers::wordle::{PlayResult, Wordle};
+use wordler::dictionary::EnglishDictionary;
+use wordler::wordle::{PlayResult, Wordle};
 
 fn main() -> Result<(), anyhow::Error> {
     let dictionary = EnglishDictionary::new()?;

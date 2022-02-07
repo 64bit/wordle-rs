@@ -6,13 +6,13 @@ Inspired by [Wordle in Bash](https://gist.github.com/huytd/6a1a6a7b34a0d0abcac00
 ## Install
 
 ```
-cargo install wordlers
+cargo install wordler
 ```
 
 ## Play
 
 ```
-worlders
+worlder
 ```
 
 ![Play Demo](play-demo.gif)
