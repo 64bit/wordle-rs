@@ -2,6 +2,9 @@
 name = "wordlers"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+description = "Library and cli for Wordle"
+keywords = ["wordle", "game", "dictionary"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
