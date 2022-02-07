@@ -8,8 +8,6 @@
 //! wordler
 //! ```
 //!
-//! ![Play Demo](https://github.com/64bit/wordle-rs/raw/main/play-demo.gif)
-//!
 //! # Example
 //!
 //! Basic usage:
