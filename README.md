@@ -21,8 +21,8 @@ wordler
 ## Basic Usage
 
 ```rust
-use wordlers::dictionary::EnglishDictionary;
-use wordlers::wordle::{Wordle, PlayResult};
+use wordler::dictionary::EnglishDictionary;
+use wordler::wordle::{Wordle, PlayResult};
 
 let dictionary = EnglishDictionary::new().unwrap();
 let mut wordle = Wordle::new(&dictionary);
