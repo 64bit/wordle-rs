@@ -24,7 +24,8 @@ pub struct EnglishDictionary {
 }
 
 impl EnglishDictionary {
-    /// Create a new English Dictionary by reading contents of `/usr/share/dict/words`.
+    /// Create a new English Dictionary of 5 letter words from
+    /// contents of `/usr/share/dict/words`.
     ///
     /// It stores `thread_rng` to support `random_word` trait method.
     ///

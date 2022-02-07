@@ -18,7 +18,7 @@ fn main() -> Result<(), anyhow::Error> {
                 println!("{}", play_result);
                 match play_result {
                     PlayResult::YouWon(_) => exit(0),
-                    PlayResult::YouLost(_) => exit(1),
+                    PlayResult::YouLost(_, _) => exit(1),
                     _ => {}
                 }
             }

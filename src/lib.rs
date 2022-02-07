@@ -24,7 +24,7 @@
 //!     println!("{}", play_result);
 //!     match play_result {
 //!         PlayResult::YouWon(_) => std::process::exit(0),
-//!         PlayResult::YouLost(_) => std::process::exit(1),
+//!         PlayResult::YouLost(_, _) => std::process::exit(1),
 //!         PlayResult::TurnResult(_) => {}
 //!     }
 //!   }

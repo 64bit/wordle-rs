@@ -50,12 +50,13 @@ pub type TurnInput = [Input; 5];
 
 /// Output of a single game play.
 pub enum PlayResult<'w> {
-    /// When game has not ended, we let user know the match that occured for thier play.
+    /// When game has not ended, we let user know the match that occured for their play.
     TurnResult(&'w TurnInput),
     /// When user guesses actual answer.
     YouWon(&'w TurnInput),
-    /// When user exhaust all of the 6 attempts, we let them know the actual answer.
-    YouLost(&'w str),
+    /// When user exhaust all of the 6 attempts
+    /// we let them know the actual answer.
+    YouLost(&'w TurnInput, &'w str),
 }
 
 impl<'w> Wordle<'w> {
@@ -65,7 +66,7 @@ impl<'w> Wordle<'w> {
     /// a random word from dictionary use `SEED` enviroment variable.
     ///
     /// ```bash no_run
-    /// SEED=dream wordlers
+    /// SEED=dream wordler
     /// ```
     pub fn new(dictionary: &'w dyn Dictionary) -> Self {
         let word: String;
@@ -145,7 +146,10 @@ impl<'w> Wordle<'w> {
 
             if self.current_attempt == 6 {
                 self.game_ended_at_attempt = self.current_attempt;
-                return Ok(PlayResult::YouLost(self.word.as_str()));
+                return Ok(PlayResult::YouLost(
+                    &self.guesses[current_attempt],
+                    self.word.as_str(),
+                ));
             } else {
                 return Ok(PlayResult::TurnResult(&self.guesses[current_attempt]));
             }
@@ -184,7 +188,10 @@ impl<'w> Display for PlayResult<'w> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
             PlayResult::TurnResult(turn_input) => fmt_turn_input(f, turn_input),
-            PlayResult::YouLost(word) => writeln!(f, "The word is {}. Ouch! 🤕", word),
+            PlayResult::YouLost(turn_input, word) => {
+                fmt_turn_input(f, turn_input)?;
+                writeln!(f, "\nThe word is {}. Ouch! 🤕", word)
+            }
             PlayResult::YouWon(turn_input) => {
                 fmt_turn_input(f, turn_input)?;
                 writeln!(f, "\nCongratulations you won! 🎉")
