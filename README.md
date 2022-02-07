@@ -12,7 +12,7 @@ cargo install wordler
 ## Play
 
 ```
-worlder
+wordler
 ```
 
 ![Play Demo](play-demo.gif)
