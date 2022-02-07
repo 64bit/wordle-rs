@@ -1,8 +1,11 @@
+//! A library of structs to represent [Wordle] and its lifecycle.
+//!
 use crate::dictionary::Dictionary;
 use ansi_term::Color::{Green, Red, White, RGB};
 use anyhow::Result;
 use std::fmt::Display;
 
+/// Represents the Wordle game and its state.
 pub struct Wordle<'w> {
     dictionary: &'w dyn Dictionary,
     word: String,
@@ -11,12 +14,21 @@ pub struct Wordle<'w> {
     game_ended_at_attempt: u8,
 }
 
-//type Distribution = HashMap<u8, u8>;
-
+/// Represent the type of match for each letter in user input.
 #[derive(Debug, PartialEq)]
 pub enum Match {
+    /// When user input letter has exact location in actual answer.
+    /// For example, if the actual answer is "DREAM" and user enters "CREAM",
+    ///  all 4 letters in the end "REAM" have `ExactLocation` match.
     ExactLocation,
+    /// When user input letter is present in the actual answer, but
+    /// user provided letter at a different location from actual.
+    /// For example, if the actual answer is "AGILE" and user enters "EAGLE",
+    /// then "AG" is present in the word just at a different location.
     PresentInWord,
+    /// When user input letter is not present in actual answer.
+    /// For example, if the actual answer is "GREAT" and user enters
+    /// "TWIST", then last 4 letters "WIST" are absent in the word.
     AbsentInWord,
 }
 
@@ -26,21 +38,35 @@ impl Default for Match {
     }
 }
 
+/// Represents each letter entered by user and its [Match] to actual answer.
 #[derive(Debug, Default)]
 pub struct Input {
     chr: u8,
     mch: Match,
 }
 
+/// Represents all 5 letters of user input and thier [Match] outcome for actual answer.
 pub type TurnInput = [Input; 5];
 
+/// Output of a single game play.
 pub enum PlayResult<'w> {
+    /// When game has not ended, we let user know the match that occured for thier play.
     TurnResult(&'w TurnInput),
+    /// When user guesses actual answer.
     YouWon(&'w TurnInput),
+    /// When user exhaust all of the 6 attempts, we let them know the actual answer.
     YouLost(&'w str),
 }
 
 impl<'w> Wordle<'w> {
+    /// Create a new Wordle game with given [Dictionary]
+    ///
+    /// To have actual answer seeded from outside instead of
+    /// a random word from dictionary use `SEED` enviroment variable.
+    ///
+    /// ```bash no_run
+    /// SEED=dream wordlers
+    /// ```
     pub fn new(dictionary: &'w dyn Dictionary) -> Self {
         let word: String;
         if let Ok(seed) = std::env::var("SEED") {
@@ -62,10 +88,12 @@ impl<'w> Wordle<'w> {
         }
     }
 
+    /// The attempt number for the current play.
     pub fn current_attempt(&self) -> u8 {
         self.current_attempt + 1
     }
 
+    /// Take user input as `word` and return the play outcome.
     pub fn play(&mut self, word: &str) -> Result<PlayResult> {
         if self.game_ended_at_attempt <= self.current_attempt + 1 {
             return Err(anyhow::anyhow!("Game Ended"));
