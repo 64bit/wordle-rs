@@ -203,7 +203,7 @@ mod tests {
         }
 
         fn is_valid_word(&self, word: &str) -> bool {
-            ["ARIEL"].contains(&word)
+            ["ARIEL", "DREAM",  "DRINK", "GLIDE", "GREAT","TREAT"].contains(&word)
         }
     }
     #[test]
@@ -250,6 +250,23 @@ mod tests {
 
         // game ended
         assert!(wordle.play("dream").is_err());
+    }
+
+    #[test]
+    fn test_win_six_attempts() {
+        let test_dict = TestDict {};
+        let mut wordle = Wordle::new(&test_dict);
+        for word in ["DREAM",  "DRINK", "GLIDE", "GREAT","TREAT"] {
+            let play_result = wordle.play(word);
+            assert!(play_result.is_ok());
+            assert!(matches!(play_result, Ok(PlayResult::TurnResult(_))));
+        }
+
+        let play_result = wordle.play("ariel");
+        assert!(play_result.is_ok());
+        assert!(matches!(play_result, Ok(PlayResult::YouWon(_))));
+        // game ended
+        assert!(wordle.play("ariel").is_err());
     }
 
     #[test]
