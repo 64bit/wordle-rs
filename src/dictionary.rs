@@ -1,3 +1,5 @@
+//! A [Dictionary] trait and [EnglishDictionary] which uses `/usr/share/dict/words` as source.
+//!
 use anyhow::Result;
 use indexmap::IndexSet;
 use rand::rngs::ThreadRng;
@@ -6,11 +8,15 @@ use std::cell::RefCell;
 
 const DICTIONARY_PATH: &str = "/usr/share/dict/words";
 
+/// Dictionary trait for online(not implemented) and offline implementations, and testing support.
 pub trait Dictionary {
+    /// Get a random word from the Dictionary.
     fn random_word(&self) -> &str;
+    /// Check if word is present in the Dictionary.
     fn is_valid_word(&self, word: &str) -> bool;
 }
 
+/// Implements [Dictionary] using `/usr/share/dict/words` as source.
 #[derive(Debug)]
 pub struct EnglishDictionary {
     words: IndexSet<String>,
@@ -18,6 +24,11 @@ pub struct EnglishDictionary {
 }
 
 impl EnglishDictionary {
+    /// Create a new English Dictionary by reading contents of `/usr/share/dict/words`.
+    ///
+    /// It stores `thread_rng` to support `random_word` trait method.
+    ///
+    /// Falliable method as source file may not exist or the encoding is not utf8.
     pub fn new() -> Result<EnglishDictionary> {
         let contents = std::fs::read(DICTIONARY_PATH)?;
         let contents = String::from_utf8(contents)?;
