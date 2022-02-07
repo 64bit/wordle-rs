@@ -1,12 +1,12 @@
 use std::process::exit;
 
 use anyhow::Result;
-use wordle::dictionary;
-use wordlers as wordle;
+use wordlers::dictionary::EnglishDictionary;
+use wordlers::wordle::{PlayResult, Wordle};
 
 fn main() -> Result<(), anyhow::Error> {
-    let dictionary = dictionary::EnglishDictionary::new()?;
-    let mut wordle = wordle::Wordle::new(&dictionary);
+    let dictionary = EnglishDictionary::new()?;
+    let mut wordle = Wordle::new(&dictionary);
     let mut current_guess = String::new();
     loop {
         current_guess.clear();
@@ -17,8 +17,8 @@ fn main() -> Result<(), anyhow::Error> {
             Ok(play_result) => {
                 println!("{}", play_result);
                 match play_result {
-                    wordle::PlayResult::YouWon(_) => exit(0),
-                    wordle::PlayResult::YouLost(_) => exit(1),
+                    PlayResult::YouWon(_) => exit(0),
+                    PlayResult::YouLost(_) => exit(1),
                     _ => {}
                 }
             }
