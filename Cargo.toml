@@ -11,9 +11,9 @@ homepage = "https://docs.rs/wordler"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.53"
-rand = "0.8.0"
-indexmap = "1.8.0"
+anyhow = "1.0.66"
+rand = "0.8.5"
+indexmap = "1.9.2"
 ansi_term = "0.12.1"
 
 [[bin]]
