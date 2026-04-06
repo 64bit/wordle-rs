@@ -15,3 +15,11 @@ tap = "64bit/homebrew-tap"
 targets = ["aarch64-apple-darwin", "aarch64-unknown-linux-gnu", "x86_64-apple-darwin", "x86_64-unknown-linux-gnu", "x86_64-pc-windows-msvc"]
 # Publish jobs to run in CI
 publish-jobs = ["homebrew"]
+
+
+# https://axodotdev.github.io/cargo-dist/book/ci/customizing.html#pinned-actions-commits
+[dist.github-action-commits]
+"actions/checkout" = "de0fac2e4500dabe0009e67214ff5f5447ce83dd" # v6.0.2
+"actions/upload-artifact" = "bbbca2ddaa5d8feaa63e36b76fdaad77386f024f" # v7.0.0
+"actions/download-artifact" = "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c" # v8.0.1
+"actions/attest-build-provenance" = "00014ed6ed5efc5b1ab7f7f34a39eb55d41aa4f8" # v3.1.0
