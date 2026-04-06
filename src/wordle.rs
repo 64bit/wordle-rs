@@ -195,6 +195,7 @@ impl<'w> Display for PlayResult<'w> {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
