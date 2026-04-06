@@ -19,3 +19,8 @@ ansi_term = "0.12.1"
 [[bin]]
 name = "wordler"
 path = "src/bin/game.rs"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
