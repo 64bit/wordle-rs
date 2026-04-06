@@ -5,7 +5,13 @@ Inspired by [Wordle in Bash](https://gist.github.com/huytd/6a1a6a7b34a0d0abcac00
 
 ## Install
 
+```bash
+brew install 64bit/tap/wordler
 ```
+
+OR
+
+```bash
 cargo install wordler
 ```
 
