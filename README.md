@@ -5,7 +5,13 @@ Inspired by [Wordle in Bash](https://gist.github.com/huytd/6a1a6a7b34a0d0abcac00
 
 ## Install
 
+```bash
+brew install 64bit/tap/wordler
 ```
+
+OR
+
+```bash
 cargo install wordler
 ```
 
@@ -18,15 +24,22 @@ wordler
 ![Play Demo](play-demo.gif)
 
 
-## Basic Usage
+## Basic Library Usage
 
 ```rust
 use wordler::dictionary::EnglishDictionary;
 use wordler::wordle::{Wordle, PlayResult};
 
+// You can implement Dictionary Trait for custom dictionaries
 let dictionary = EnglishDictionary::new().unwrap();
+
+//  Initialize game with a valid dictionary
 let mut wordle = Wordle::new(&dictionary);
+
+// Game Turn
 let play_result = wordle.play("dream");
+
+// Turn Result
 match play_result {
   Ok(play_result) => {
     println!("{}", play_result);

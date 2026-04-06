@@ -15,7 +15,7 @@ pub struct Wordle<'w> {
 }
 
 /// Represent the type of match for each letter in user input.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub enum Match {
     /// When user input letter has exact location in actual answer.
     /// For example, if the actual answer is "DREAM" and user enters "CREAM",
@@ -29,13 +29,8 @@ pub enum Match {
     /// When user input letter is not present in actual answer.
     /// For example, if the actual answer is "GREAT" and user enters
     /// "TWIST", then last 4 letters "WIST" are absent in the word.
+    #[default]
     AbsentInWord,
-}
-
-impl Default for Match {
-    fn default() -> Self {
-        Match::AbsentInWord
-    }
 }
 
 /// Represents each letter entered by user and its [Match] to actual answer.
@@ -95,7 +90,7 @@ impl<'w> Wordle<'w> {
     }
 
     /// Take user input as `word` and return the play outcome.
-    pub fn play(&mut self, word: &str) -> Result<PlayResult> {
+    pub fn play(&mut self, word: &str) -> Result<PlayResult<'_>> {
         if self.game_ended_at_attempt <= self.current_attempt + 1 {
             return Err(anyhow::anyhow!("Game Ended"));
         }
@@ -200,6 +195,7 @@ impl<'w> Display for PlayResult<'w> {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
