@@ -10,15 +10,18 @@
 //!
 //! # Example
 //!
-//! Basic usage:
+//! Basic Library usage:
 //!
 //! ```
 //! use wordler::dictionary::EnglishDictionary;
 //! use wordler::wordle::{Wordle, PlayResult};
-//!
+//! // You can implement Dictionary Trait for custom dictionaries
 //! let dictionary = EnglishDictionary::new().unwrap();
+//! //  Initialize game with a valid dictionary
 //! let mut wordle = Wordle::new(&dictionary);
+//! // Game Turn
 //! let play_result = wordle.play("dream");
+//! // Turn Result
 //! match play_result {
 //!   Ok(play_result) => {
 //!     println!("{}", play_result);
