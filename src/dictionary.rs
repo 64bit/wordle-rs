@@ -53,6 +53,6 @@ impl Dictionary for EnglishDictionary {
     }
 
     fn is_valid_word(&self, word: &str) -> bool {
-        matches!(self.words.get(word), Some(_))
+        self.words.get(word).is_some()
     }
 }
