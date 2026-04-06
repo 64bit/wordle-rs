@@ -15,8 +15,7 @@ pub struct Wordle<'w> {
 }
 
 /// Represent the type of match for each letter in user input.
-#[derive(Debug, PartialEq)]
-#[derive(Default)]
+#[derive(Debug, PartialEq, Default)]
 pub enum Match {
     /// When user input letter has exact location in actual answer.
     /// For example, if the actual answer is "DREAM" and user enters "CREAM",
@@ -33,7 +32,6 @@ pub enum Match {
     #[default]
     AbsentInWord,
 }
-
 
 /// Represents each letter entered by user and its [Match] to actual answer.
 #[derive(Debug, Default)]
